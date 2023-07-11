@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <title>Rotate Cube with Mouse - Three.js</title>
+   <style>
+      body,
+      canvas {
+         margin: 0;
+         background-color: aliceblue;
+         user-select: none;
+      }
+
+      small {
+         color: white;
+         background-color: #223311;
+         padding: .05em .3em;
+         pointer-events: none;
+      }
+
+      #divCubeCanvas {
+         width: 500px;
+         height: 500px;
+      }
+   </style>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+
+
+<body>
+   <div class="divRangeSliders">
+
+      <div id="divCubeCanvas"></div>
+
+      <small>zoom</small><br />
+      <input id="inpZoomSlider" type="range" min="0.25" max="2.5" step="0.1" value="1.5" /><br />
+
+      <small>margin</small><br />
+      <input id="inpMarginSlider" type="range" min="2" max="3.5" step="0.25" value="2.5" /><br />
+
+      <small>separate</small><br />
+      <input id="inpYScaleFactorSlider" type="range" min="0.6" max="5.0" step="0.1" value="1.0" /><br /><br />
+
+      <button id="btnExplodeCubes">eplode</button><br />
+   </div>
+
+   <script src="dist/index.js"></script>
+
+
+</body>
+
+
+
+
+</html>
