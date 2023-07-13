@@ -4,24 +4,13 @@
 })((function () { 'use strict';
 
    (async () => {
-
-
-
       const Game = await Promise.resolve().then(function () { return players; });
       await Promise.resolve().then(function () { return drawing; });
       await Promise.resolve().then(function () { return dataClasses; });
-
-
+      //   const Simulator = await import("./simulator.js");
 
       let game = new Game.default();
-      console.log("gam:");
-      console.log(game.play());
-      console.log(game);
-      console.log(game.cubeSet.toStringTUI());
-
-
-
-
+      game.render();
 
 
    })();
@@ -220,55 +209,35 @@
          this.yScaleFactor = inpYScaleFactorSlider.value;
          this.mesh = null;
          this.cubes = new Array(3).fill(null).map(() => new Array(3).fill(null).map(() => new Array(3).fill(null)));
+         this.controls = null;
          this.init();
       }
 
       init() {
-         document.querySelector("#divCubeCanvas").width;
          this.renderer.setSize(document.querySelector("#divCubeCanvas").clientWidth, document.querySelector("#divCubeCanvas").clientWidth);
          this.renderer.setPixelRatio(1.0);
          this.canvasEl.appendChild(this.renderer.domElement);
-         this.camera.position.set(0, 0, 6.5);
+         this.camera.position.set(0, 0, 10);
          this.addCubesToScene();
          this.addEventListeners();
+         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+         this.controls.enableDamping = true;
+         this.controls.enablePan = false; // Enable panning
+         this.controls.dampingFactor = 0.15;
+         this.controls.rotateSpeed = 0.35;
+         this.controls.zoomSpeed = 0.75;
+         this.controls.target.set(0, 0, 0);
          this.animate();
          this.modifyMargin(inpMarginSlider.value);
          btnExplodeCubes.addEventListener("click", evn => {
             this.explodeCubes();
          });
       }
+
       addEventListeners() {
-         window.addEventListener('mousemove', this.rotateCube.bind(this));
-         this.canvasEl.addEventListener('mousedown', this.startDrag.bind(this));
-         window.addEventListener('mouseup', this.stopDrag.bind(this));
-
-         this.canvasEl.addEventListener('touchstart', this.startDrag.bind(this));
-         window.addEventListener('touchmove', this.rotateCube.bind(this));
-         window.addEventListener('touchend', this.stopDrag.bind(this));
-         window.addEventListener('touchcancel', this.stopDrag.bind(this));
-
          inpMarginSlider.addEventListener('input', (evn) => this.modifyMargin(evn.target.value));
-         inpZoomSlider.addEventListener('input', (evn) => this.modifyCameraZoom(evn.target.value));
+         //inpZoomSlider.addEventListener('input', (evn) => this.modifyCameraZoom(evn.target.value));
          inpYScaleFactorSlider.addEventListener('input', (evn) => this.modifyYScaleFactor(evn.target.value));
-      }
-
-
-      rotateCube(event) {
-         this.isDragging = this.isDragging || false;
-         this.previousMousePosition = this.previousMousePosition || { x: 0.0, y: 0.0 };
-
-         if (event.buttons === undefined || event.buttons === 0) this.isDragging = false;
-
-         if (this.isDragging) {
-            const deltaMove = {
-               x: event.clientX - this.previousMousePosition.x,
-               y: event.clientY - this.previousMousePosition.y,
-            };
-            this.scene.rotation.x += deltaMove.y * 0.0010;
-            this.scene.rotation.y += deltaMove.x * 0.0013;
-         }
-
-         this.previousMousePosition = { x: event.clientX, y: event.clientY };
       }
 
       findByCoordinates(x, y, z) {
@@ -286,7 +255,7 @@
                for (let k = 0; k < 3; k++) {
                   const cube = new CubeObject(this.scene, this.renderer, this.camera, this, { x: i, y: j, z: k });
                   cube.mesh = CubeObject.createCubeMesh(this.yScaleFactor);
-                  cube.mesh.userData.cubeObjectRef = cube; // Update this line
+                  cube.mesh.userData.cubeObjectRef = cube;
                   this.cubes[i][j][k] = cube;
                   const x = (i - 1.5) * margin;
                   const y = (j - 1.5) * (margin * this.yScaleFactor);
@@ -298,21 +267,13 @@
          }
       }
 
-
       allCubes() {
          return this.cubes.flat(2);
       }
 
-      startDrag() {
-         this.isDragging = true;
-      }
-
-      stopDrag() {
-         this.isDragging = false;
-      }
-
       animate() {
          requestAnimationFrame(this.animate.bind(this));
+         this.controls.update();
          this.renderer.render(this.scene, this.camera);
       }
 
@@ -352,7 +313,6 @@
          animateExplosion();
       }
 
-
       modifyMargin(marginIn) {
          let margin = marginIn / 2.0;
          const marginIncrement = margin;
@@ -381,7 +341,6 @@
          this.modifyMargin(inpMarginSlider.value);
       }
    }
-
    class CubeObject {
       constructor(scene, renderer, camera, parent, coords) {
          this.scene = scene;
@@ -403,12 +362,19 @@
          const geometry = new THREE.BoxGeometry(1, yScaleFactor, 1);
          const edgesGeometry = new THREE.EdgesGeometry(geometry);
          const material = new THREE.MeshBasicMaterial({ color: 0x28df31 });
-         const edgesMaterial = new THREE.LineBasicMaterial({ color: 0xffddff, linewidth: 4 });
+         const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x33aabb, linewidth: 5 });
          const cube = new THREE.Mesh(geometry, material);
          const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
          cube.add(edges);
          return cube;
       }
+
+      setColor(color) {
+         const material = this.mesh.material;
+         material.color.set(color);
+         material.needsUpdate = true;
+      }
+
       handleMouseClick(event) {
          // Calculate the mouse position relative to the canvas element
          const canvasBounds = this.renderer.domElement.getBoundingClientRect();
@@ -432,15 +398,9 @@
 
             // Change the cube's color
             const cube = intersectedCube.object.userData.cubeObjectRef;
-            const material = cube.mesh.material;
-            material.color.set(0xff0000); // Change the color to red
-            material.needsUpdate = true;
+            cube.setColor(0xff0000); // Change the color to red
          }
       }
-
-
-
-
    }
 
    var drawing = /*#__PURE__*/Object.freeze({
@@ -536,7 +496,7 @@
    class Game {
       constructor() {
 
-         this.cubeScene = new CubesScene();
+         this.cubeScene = null;
 
          this.cubeSet = new CubeSet(this);
          this.players = [
@@ -544,27 +504,38 @@
             new Player("Player 2", ClaimState.O),
          ];
          this.currentPlayerIndex = 0;
+
+         this.winner = null;
+         this.gameOver = null;
       }
 
+      render() {
+         this.cubeScene = new CubesScene();
+      }
       play() {
-         let gameOver = false;
-         let winner = null;
+         this.gameOver = false;
+         this.winner = null;
 
-         while (!gameOver) {
+         while (!this.gameOver) {
             const currentPlayer = this.players[this.currentPlayerIndex];
             const move = currentPlayer.makeMove(this.cubeSet);
             console.log(`${currentPlayer.name} claimed cube at (${move.x}, ${move.y}, ${move.z})`);
 
             const consecutiveClaims = this.cubeSet.getConsecutiveClaims(3);
             if (consecutiveClaims.length > 0) {
-               gameOver = true;
-               winner = currentPlayer;
+
+               this.gameOver = true;
+               this.winner = currentPlayer;
+
+               console.log(`Game over! ${this.winner.name} wins!`);
+
             } else {
                this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
             }
          }
 
-         console.log(`Game over! ${winner.name} wins!`);
+
+
       }
    }
 
