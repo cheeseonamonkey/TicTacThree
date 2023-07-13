@@ -1,23 +1,33 @@
+
+
 export class CubesScene {
    constructor(parentGame) {
       this.parentGame = parentGame;
       this.scene = new THREE.Scene();
-      this.camera = new THREE.PerspectiveCamera(65, 1);
+      this.camera = new THREE.PerspectiveCamera(70, 1.0);
       this.renderer = new THREE.WebGLRenderer({ antialias: true });
       this.canvasEl = document.getElementById('divCubeCanvas');
       this.yScaleFactor = inpYScaleFactorSlider.value;
       this.mesh = null;
       this.cubes = new Array(3).fill(null).map(() => new Array(3).fill(null).map(() => new Array(3).fill(null)));
+      this.controls = null;
       this.init();
    }
 
    init() {
-      this.renderer.setSize(800, 800);
+      this.renderer.setSize(document.querySelector("#divCubeCanvas").clientWidth, document.querySelector("#divCubeCanvas").clientWidth);
       this.renderer.setPixelRatio(1.0);
       this.canvasEl.appendChild(this.renderer.domElement);
-      this.camera.position.set(0, 0, 6.5);
+      this.camera.position.set(0, 0, 10);
       this.addCubesToScene();
       this.addEventListeners();
+      this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.enableDamping = true;
+      this.controls.enablePan = false; // Enable panning
+      this.controls.dampingFactor = 0.15;
+      this.controls.rotateSpeed = 0.35;
+      this.controls.zoomSpeed = 0.75;
+      this.controls.target.set(0, 0, 0);
       this.animate();
       this.modifyMargin(inpMarginSlider.value);
       btnExplodeCubes.addEventListener("click", evn => {
@@ -26,30 +36,9 @@ export class CubesScene {
    }
 
    addEventListeners() {
-      window.addEventListener('mousemove', this.rotateCube.bind(this));
-      this.canvasEl.addEventListener('mousedown', this.startDrag.bind(this));
-      window.addEventListener('mouseup', this.stopDrag.bind(this));
       inpMarginSlider.addEventListener('input', (evn) => this.modifyMargin(evn.target.value));
-      inpZoomSlider.addEventListener('input', (evn) => this.modifyCameraZoom(evn.target.value));
+      //inpZoomSlider.addEventListener('input', (evn) => this.modifyCameraZoom(evn.target.value));
       inpYScaleFactorSlider.addEventListener('input', (evn) => this.modifyYScaleFactor(evn.target.value));
-   }
-
-   rotateCube(event) {
-      this.isDragging = this.isDragging || false;
-      this.previousMousePosition = this.previousMousePosition || { x: 0.0, y: 0.0 };
-
-      if (event.buttons === undefined || event.buttons === 0) this.isDragging = false;
-
-      if (this.isDragging) {
-         const deltaMove = {
-            x: event.clientX - this.previousMousePosition.x,
-            y: event.clientY - this.previousMousePosition.y,
-         };
-         this.scene.rotation.x += deltaMove.y * 0.0010;
-         this.scene.rotation.y += deltaMove.x * 0.0013;
-      }
-
-      this.previousMousePosition = { x: event.clientX, y: event.clientY };
    }
 
    findByCoordinates(x, y, z) {
@@ -67,7 +56,7 @@ export class CubesScene {
             for (let k = 0; k < 3; k++) {
                const cube = new CubeObject(this.scene, this.renderer, this.camera, this, { x: i, y: j, z: k });
                cube.mesh = CubeObject.createCubeMesh(this.yScaleFactor);
-               cube.mesh.userData.cubeObjectRef = cube; // Update this line
+               cube.mesh.userData.cubeObjectRef = cube;
                this.cubes[i][j][k] = cube;
                const x = (i - 1.5) * margin;
                const y = (j - 1.5) * (margin * this.yScaleFactor);
@@ -79,21 +68,13 @@ export class CubesScene {
       }
    }
 
-
    allCubes() {
       return this.cubes.flat(2);
    }
 
-   startDrag() {
-      this.isDragging = true;
-   }
-
-   stopDrag() {
-      this.isDragging = false;
-   }
-
    animate() {
       requestAnimationFrame(this.animate.bind(this));
+      this.controls.update();
       this.renderer.render(this.scene, this.camera);
    }
 
@@ -133,7 +114,6 @@ export class CubesScene {
       animateExplosion();
    }
 
-
    modifyMargin(marginIn) {
       let margin = marginIn / 2.0;
       const marginIncrement = margin;
@@ -162,7 +142,6 @@ export class CubesScene {
       this.modifyMargin(inpMarginSlider.value);
    }
 }
-
 export class CubeObject {
    constructor(scene, renderer, camera, parent, coords) {
       this.scene = scene;
@@ -184,12 +163,19 @@ export class CubeObject {
       const geometry = new THREE.BoxGeometry(1, yScaleFactor, 1);
       const edgesGeometry = new THREE.EdgesGeometry(geometry);
       const material = new THREE.MeshBasicMaterial({ color: 0x28df31 });
-      const edgesMaterial = new THREE.LineBasicMaterial({ color: 0xffddff, linewidth: 4 });
+      const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x33aabb, linewidth: 5 });
       const cube = new THREE.Mesh(geometry, material);
       const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
       cube.add(edges);
       return cube;
    }
+
+   setColor(color) {
+      const material = this.mesh.material;
+      material.color.set(color);
+      material.needsUpdate = true;
+   }
+
    handleMouseClick(event) {
       // Calculate the mouse position relative to the canvas element
       const canvasBounds = this.renderer.domElement.getBoundingClientRect();
@@ -213,13 +199,7 @@ export class CubeObject {
 
          // Change the cube's color
          const cube = intersectedCube.object.userData.cubeObjectRef;
-         const material = cube.mesh.material;
-         material.color.set(0xff0000); // Change the color to red
-         material.needsUpdate = true;
+         cube.setColor(0xff0000); // Change the color to red
       }
    }
-
-
-
-
 }

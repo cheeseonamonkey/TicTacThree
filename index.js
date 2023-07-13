@@ -1,19 +1,11 @@
 (async () => {
-
-
-
-   const Game = await import("./players.js")
+   const Game = await import("./players.js");
    await import("./drawing.js");
    await import("./dataClasses.js");
+   //   const Simulator = await import("./simulator.js");
 
-
-
-   console.log(new Game.default());
-
-
-
-
-
+   let game = new Game.default();
+   game.render()
 
 
 })();

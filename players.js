@@ -1,19 +1,12 @@
 import { CubeSet, ClaimState, Cube } from "./dataClasses.js";
 
-var Draw
-
-(async () => {
-
-   var Players = await import("./players.js")
-   Draw = await import("./drawing.js");
-
-})();
+import { CubeObject, CubesScene } from "./drawing.js";
 
 
 class Player {
-   constructor(name, claimState) {
+   constructor(name, claimSymbol) {
       this.name = name;
-      this.claimState = claimState;
+      this.claimSymbol = claimSymbol;
    }
 
    makeMove(cubeSet) {
@@ -41,7 +34,7 @@ class Player {
       for (const consecutiveGroup of consecutiveClaims) {
          const emptyCube = consecutiveGroup.find((cube) => cube.claimState === ClaimState.EMPTY);
          if (emptyCube) {
-            emptyCube.claimState = this.claimState;
+            emptyCube.claimState = this.claimSymbol;
             return emptyCube;
          }
       }
@@ -53,7 +46,7 @@ class Player {
       for (const consecutiveGroup of consecutiveClaims) {
          const emptyCube = consecutiveGroup.find((cube) => cube.claimState === ClaimState.EMPTY);
          if (emptyCube) {
-            emptyCube.claimState = this.claimState;
+            emptyCube.claimState = this.claimSymbol;
             return emptyCube;
          }
       }
@@ -65,7 +58,7 @@ class Player {
       for (const consecutiveGroup of consecutiveClaims) {
          const emptyCube = consecutiveGroup.find((cube) => cube.claimState === ClaimState.EMPTY);
          if (emptyCube) {
-            emptyCube.claimState = this.claimState;
+            emptyCube.claimState = this.claimSymbol;
             return emptyCube;
          }
       }
@@ -87,7 +80,7 @@ class Player {
       if (emptyCubes.length > 0) {
          const randomIndex = Math.floor(Math.random() * emptyCubes.length);
          const randomCube = emptyCubes[randomIndex];
-         randomCube.claimState = this.claimState;
+         randomCube.claimState = this.claimSymbol;
          return randomCube;
       }
       return null;
@@ -97,9 +90,7 @@ class Player {
 export default class Game {
    constructor() {
 
-      console.log(Draw)
-
-      this.cubeScene = new Draw.CubesScene()
+      this.cubeScene = null;
 
       this.cubeSet = new CubeSet(this);
       this.players = [
@@ -107,27 +98,38 @@ export default class Game {
          new Player("Player 2", ClaimState.O),
       ];
       this.currentPlayerIndex = 0;
+
+      this.winner = null;
+      this.gameOver = null;
    }
 
+   render() {
+      this.cubeScene = new CubesScene()
+   }
    play() {
-      let gameOver = false;
-      let winner = null;
+      this.gameOver = false;
+      this.winner = null;
 
-      while (!gameOver) {
+      while (!this.gameOver) {
          const currentPlayer = this.players[this.currentPlayerIndex];
          const move = currentPlayer.makeMove(this.cubeSet);
          console.log(`${currentPlayer.name} claimed cube at (${move.x}, ${move.y}, ${move.z})`);
 
          const consecutiveClaims = this.cubeSet.getConsecutiveClaims(3);
          if (consecutiveClaims.length > 0) {
-            gameOver = true;
-            winner = currentPlayer;
+
+            this.gameOver = true;
+            this.winner = currentPlayer;
+
+            console.log(`Game over! ${this.winner.name} wins!`);
+
          } else {
             this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
          }
       }
 
-      console.log(`Game over! ${winner.name} wins!`);
+
+
    }
 }
 
