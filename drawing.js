@@ -33,6 +33,11 @@ export class CubesScene {
       btnExplodeCubes.addEventListener("click", evn => {
          this.explodeCubes();
       })
+
+      //set a better target (after animate() call):
+      const lookAtMe = this.cubes[1][1][1].mesh.position
+      //console.log(lookAtMe)
+      this.controls.target.set(lookAtMe.x, lookAtMe.y, lookAtMe.z);
    }
 
    addEventListeners() {
@@ -75,8 +80,17 @@ export class CubesScene {
    animate() {
       try {
          requestAnimationFrame(this.animate.bind(this));
+
          this.controls.update();
          this.renderer.render(this.scene, this.camera);
+
+
+         //set a better target (after animate() call):
+         const lookAtMe = this.cubes[1][1][1].mesh.position
+         //console.log(lookAtMe)
+         this.controls.target.set(lookAtMe.x, lookAtMe.y, lookAtMe.z);
+
+
       } catch (err) {
          console.error('Exception in animate() method:', err.message);
          console.error(err)
@@ -136,6 +150,12 @@ export class CubesScene {
          }
       }
       this.renderer.render(this.scene, this.camera);
+
+      //set a better target (after animate() call):
+      const lookAtMe = this.cubes[1][1][1].mesh.position
+      //console.log(lookAtMe)
+      this.controls.target.set(lookAtMe.x, lookAtMe.y, lookAtMe.z);
+
    }
 
    modifyCameraZoom(zoom) {
@@ -146,6 +166,11 @@ export class CubesScene {
    modifyYScaleFactor(yScaleFactor) {
       this.yScaleFactor = yScaleFactor;
       this.modifyMargin(inpMarginSlider.value);
+
+      //set a better target (after animate() call):
+      const lookAtMe = this.cubes[1][1][1].mesh.position
+      //console.log(lookAtMe)
+      this.controls.target.set(lookAtMe.x, lookAtMe.y, lookAtMe.z);
    }
 }
 export class CubeObject {

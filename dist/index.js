@@ -232,6 +232,11 @@
          btnExplodeCubes.addEventListener("click", evn => {
             this.explodeCubes();
          });
+
+         //set a better target (after animate() call):
+         const lookAtMe = this.cubes[1][1][1].mesh.position;
+         //console.log(lookAtMe)
+         this.controls.target.set(lookAtMe.x, lookAtMe.y, lookAtMe.z);
       }
 
       addEventListeners() {
@@ -274,8 +279,17 @@
       animate() {
          try {
             requestAnimationFrame(this.animate.bind(this));
+
             this.controls.update();
             this.renderer.render(this.scene, this.camera);
+
+
+            //set a better target (after animate() call):
+            const lookAtMe = this.cubes[1][1][1].mesh.position;
+            //console.log(lookAtMe)
+            this.controls.target.set(lookAtMe.x, lookAtMe.y, lookAtMe.z);
+
+
          } catch (err) {
             console.error('Exception in animate() method:', err.message);
             console.error(err);
@@ -335,6 +349,12 @@
             }
          }
          this.renderer.render(this.scene, this.camera);
+
+         //set a better target (after animate() call):
+         const lookAtMe = this.cubes[1][1][1].mesh.position;
+         //console.log(lookAtMe)
+         this.controls.target.set(lookAtMe.x, lookAtMe.y, lookAtMe.z);
+
       }
 
       modifyCameraZoom(zoom) {
@@ -345,6 +365,11 @@
       modifyYScaleFactor(yScaleFactor) {
          this.yScaleFactor = yScaleFactor;
          this.modifyMargin(inpMarginSlider.value);
+
+         //set a better target (after animate() call):
+         const lookAtMe = this.cubes[1][1][1].mesh.position;
+         //console.log(lookAtMe)
+         this.controls.target.set(lookAtMe.x, lookAtMe.y, lookAtMe.z);
       }
    }
    class CubeObject {
