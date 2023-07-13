@@ -304,7 +304,10 @@
          const animateExplosion = () => {
             let currentMargin = 0.5;
 
+
+
             const animate = () => {
+
                currentMargin += 0.03;
                if (currentMargin >= targetMargin) {
                   currentMargin = targetMargin;
@@ -321,13 +324,22 @@
                this.camera.rotation.y += rotationSpeed;
                this.camera.rotation.z += rotationSpeed;
 
-               this.camera.lookAt(this.scene.position);
+
+               //set better camera target
+               const lookAtMe = this.cubes[1][1][1].mesh.position;
+               this.controls.target.set(lookAtMe.x, lookAtMe.y, lookAtMe.z);
+
+
                this.renderer.render(this.scene, this.camera);
+
+
+
 
                requestAnimationFrame(animate);
             };
 
             animate();
+
          };
 
          animateExplosion();

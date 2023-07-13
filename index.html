@@ -54,15 +54,15 @@
       :root {
          --range-track-color: #86375d;
          --range-track-active-color: #460727;
-         --range-track-height: 20px;
-         --range-track-border-radius: 5px;
+         --range-track-height: 26px;
+         --range-track-border-radius: 11px;
          --range-track-hover-color: #6c294a;
 
-         --range-thumb-color: #d91111;
-         --range-thumb-size: 30px;
-         --range-thumb-border-radius: 48%;
-         --range-thumb-hover-color: #b91249;
-         --range-thumb-active-color: #811515;
+         --range-thumb-color: #bb4646;
+         --range-thumb-size: 35px;
+         --range-thumb-border-radius: 47.5%;
+         --range-thumb-hover-color: #eb6161;
+         --range-thumb-active-color: #922222;
       }
 
       input[type="range"] {
@@ -89,7 +89,7 @@
          height: var(--range-thumb-size);
          background: var(--range-thumb-color);
          border-radius: var(--range-thumb-border-radius);
-         /*         margin-top: calc((var(--range-thumb-size) - var(--range-track-height)) / 2);    */
+         margin-top: -4px;
          cursor: pointer;
          transition: background 0.085s;
       }
