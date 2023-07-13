@@ -1,7 +1,8 @@
 (function (factory) {
    typeof define === 'function' && define.amd ? define(factory) :
-   factory();
-})((function () { 'use strict';
+      factory();
+})((function () {
+   'use strict';
 
    (async () => {
       const Game = await Promise.resolve().then(function () { return players; });
@@ -236,7 +237,6 @@
 
       addEventListeners() {
          inpMarginSlider.addEventListener('input', (evn) => this.modifyMargin(evn.target.value));
-         //inpZoomSlider.addEventListener('input', (evn) => this.modifyCameraZoom(evn.target.value));
          inpYScaleFactorSlider.addEventListener('input', (evn) => this.modifyYScaleFactor(evn.target.value));
       }
 
