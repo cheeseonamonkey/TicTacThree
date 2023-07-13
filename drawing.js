@@ -73,10 +73,16 @@ export class CubesScene {
    }
 
    animate() {
-      requestAnimationFrame(this.animate.bind(this));
-      this.controls.update();
-      this.renderer.render(this.scene, this.camera);
+      try {
+         requestAnimationFrame(this.animate.bind(this));
+         this.controls.update();
+         this.renderer.render(this.scene, this.camera);
+      } catch (err) {
+         console.error('Exception in animate() method:', err.message);
+         console.error(err)
+      }
    }
+
 
    explodeCubes() {
       const targetMargin = 10;
@@ -194,12 +200,15 @@ export class CubeObject {
 
       // Check if an intersected cube was found
       if (intersectedCube) {
-         // Print the CubeObject for the mesh to the console
-         console.log(intersectedCube.object.userData.cubeObjectRef);
+
+         let cubeObjectSelected = intersectedCube.object.userData.cubeObjectRef
+
+         // Print the final CubeObject coords to the console - raycast intersected, nearest to camera
+         console.clear()
+         console.log(cubeObjectSelected.coords);
 
          // Change the cube's color
-         const cube = intersectedCube.object.userData.cubeObjectRef;
-         cube.setColor(0xff0000); // Change the color to red
+         cubeObjectSelected.setColor(0xff0000); // Change the color to red
       }
    }
 }

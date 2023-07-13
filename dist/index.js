@@ -1,8 +1,7 @@
 (function (factory) {
    typeof define === 'function' && define.amd ? define(factory) :
-      factory();
-})((function () {
-   'use strict';
+   factory();
+})((function () { 'use strict';
 
    (async () => {
       const Game = await Promise.resolve().then(function () { return players; });
@@ -50,7 +49,7 @@
       }
 
       logAll() {
-         console.log(this.cubes[0]);
+         //console.log(this.cubes[0])
          //console.log(this.cubes[1])
          //console.log(this.cubes[2])
       }
@@ -237,6 +236,7 @@
 
       addEventListeners() {
          inpMarginSlider.addEventListener('input', (evn) => this.modifyMargin(evn.target.value));
+         //inpZoomSlider.addEventListener('input', (evn) => this.modifyCameraZoom(evn.target.value));
          inpYScaleFactorSlider.addEventListener('input', (evn) => this.modifyYScaleFactor(evn.target.value));
       }
 
@@ -272,10 +272,16 @@
       }
 
       animate() {
-         requestAnimationFrame(this.animate.bind(this));
-         this.controls.update();
-         this.renderer.render(this.scene, this.camera);
+         try {
+            requestAnimationFrame(this.animate.bind(this));
+            this.controls.update();
+            this.renderer.render(this.scene, this.camera);
+         } catch (err) {
+            console.error('Exception in animate() method:', err.message);
+            console.error(err);
+         }
       }
+
 
       explodeCubes() {
          const targetMargin = 10;
@@ -393,12 +399,15 @@
 
          // Check if an intersected cube was found
          if (intersectedCube) {
-            // Print the CubeObject for the mesh to the console
-            console.log(intersectedCube.object.userData.cubeObjectRef);
+
+            let cubeObjectSelected = intersectedCube.object.userData.cubeObjectRef;
+
+            // Print the final CubeObject coords to the console - raycast intersected, nearest to camera
+            console.clear();
+            console.log(cubeObjectSelected.coords);
 
             // Change the cube's color
-            const cube = intersectedCube.object.userData.cubeObjectRef;
-            cube.setColor(0xff0000); // Change the color to red
+            cubeObjectSelected.setColor(0xff0000); // Change the color to red
          }
       }
    }

@@ -34,7 +34,7 @@ export class CubeSet {
    }
 
    logAll() {
-      console.log(this.cubes[0])
+      //console.log(this.cubes[0])
       //console.log(this.cubes[1])
       //console.log(this.cubes[2])
    }
