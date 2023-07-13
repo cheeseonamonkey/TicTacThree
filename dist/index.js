@@ -13,8 +13,11 @@
 
 
 
-      console.log(new Game.default());
-
+      let game = new Game.default();
+      console.log("gam:");
+      console.log(game.play());
+      console.log(game);
+      console.log(game.cubeSet.toStringTUI());
 
 
 
@@ -369,15 +372,18 @@
             this.explodeCubes();
          });
       }
-
       addEventListeners() {
          window.addEventListener('mousemove', this.rotateCube.bind(this));
+         window.addEventListener('touchmove', this.rotateCube.bind(this));
          this.canvasEl.addEventListener('mousedown', this.startDrag.bind(this));
+         this.canvasEl.addEventListener('touchstart', this.startDrag.bind(this));
          window.addEventListener('mouseup', this.stopDrag.bind(this));
+         window.addEventListener('touchend', this.stopDrag.bind(this));
          inpMarginSlider.addEventListener('input', (evn) => this.modifyMargin(evn.target.value));
          inpZoomSlider.addEventListener('input', (evn) => this.modifyCameraZoom(evn.target.value));
          inpYScaleFactorSlider.addEventListener('input', (evn) => this.modifyYScaleFactor(evn.target.value));
       }
+
 
       rotateCube(event) {
          this.isDragging = this.isDragging || false;
