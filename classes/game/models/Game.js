@@ -23,8 +23,13 @@ export default class Game {
         this.gameOver = false;
     }
 
+    switchPlayers(verbose = false) {
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+        if (verbose) console.log("the current player is now: " + this.currentPlayer)
+    }
+
     render() {
-        this.cubeScene = new CubesScene();
+        this.cubeScene = new CubesScene(this);
     }
     play(verboseConsole = false) {
         this.gameOver = false;

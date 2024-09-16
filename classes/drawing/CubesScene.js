@@ -60,7 +60,7 @@ export class CubesScene {
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
                 for (let k = 0; k < 3; k++) {
-                    const cube = new CubeObject(this.scene, this.renderer, this.camera, this, { x: i, y: j, z: k });
+                    const cube = new CubeObject(this.scene, this.renderer, this.camera, this.parentGame, { x: i, y: j, z: k });
                     cube.mesh = CubeObject.createCubeMesh(this.yScaleFactor);
                     cube.mesh.userData.cubeObjectRef = cube;
                     this.cubes[i][j][k] = cube;

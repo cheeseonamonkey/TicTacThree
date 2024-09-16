@@ -1,18 +1,17 @@
 
 export class CubeObject {
-    constructor(scene, renderer, camera, parent, coords) {
-        this.scene = scene;
+    constructor(parentScene, renderer, camera, parentGame, coords) {
+        this.parentScene = parentScene;
         this.renderer = renderer;
         this.camera = camera;
-        this.parent = parent;
+        this.parentGame = parentGame;
         this.coords = coords;
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
-        this.init();
-    }
 
-    init() {
-        this.renderer.domElement.addEventListener('click', this.handleMouseClick.bind(this), {});
+        this.renderer.domElement.removeEventListener('click', this.handleMouseClick.bind(this));
+        this.renderer.domElement.addEventListener('click', this.handleMouseClick.bind(this));
+        this.raycaster.precision = 0.05;
         this.raycaster.precision = 0.05;
     }
 
@@ -22,6 +21,8 @@ export class CubeObject {
         const material = new THREE.MeshBasicMaterial({ color: 0x28df31 });
         const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x33aabb, linewidth: 5 });
         const cube = new THREE.Mesh(geometry, material);
+        this.cubeMesh = cube;
+
         const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
         cube.add(edges);
         return cube;
@@ -34,6 +35,10 @@ export class CubeObject {
     }
 
     handleMouseClick(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+
         // Calculate the mouse position relative to the canvas element
         const canvasBounds = this.renderer.domElement.getBoundingClientRect();
         const mouseX = ((event.clientX - canvasBounds.left) / canvasBounds.width) * 2 - 1;
@@ -41,25 +46,47 @@ export class CubeObject {
 
         // Set the mouse position for raycasting
         this.mouse.set(mouseX, mouseY);
-
         // Raycast from the camera to the mouse position
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
         // Find the first intersected cube
-        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+        const intersects = this.raycaster.intersectObjects(this.parentScene.children, true);
         const intersectedCube = intersects.find(intersect => intersect.object.userData.cubeObjectRef);
 
         // Check if an intersected cube was found
         if (intersectedCube) {
 
-            let cubeObjectSelected = intersectedCube.object.userData.cubeObjectRef;
+            let cubeObject = intersectedCube;
+            let cubeSelected = intersectedCube.object.userData.cubeObjectRef;
+            let game = this.parentGame
+            let cubeSet = game.cubeSet
 
-            // Print the final CubeObject coords to the console - raycast intersected, nearest to camera
-            console.clear();
-            console.log(cubeObjectSelected.coords);
+            const currentPlayer = game.players[game.currentPlayerIndex];
 
-            // Change the cube's color
-            cubeObjectSelected.setColor(0xff0000); // Change the color to red
+            // player makes move...
+            currentPlayer.makeMove(cubeSet, true)
+
+            console.log(game)
+            console.log(cubeObject)
+            console.log(cubeSelected)
+            console.log(currentPlayer)
+
+            if (cubeSelected)
+
+                if (game.currentPlayerIndex == 0)
+                    cubeSelected.setColor(0xff0000); // Change the color to red
+                else if (game.currentPlayerIndex == 1)
+                    cubeSelected.setColor(0x1111ff); // Change the color to blue
+
+            const consecutiveClaims = cubeSet.getConsecutiveClaims(3);
+            if (consecutiveClaims.length > 0) {
+                console.log("consecutive 3 claims: ", consecutiveClaims)
+                console.log(`Game over! ${game.winner} wins!`);
+            } else {
+                game.switchPlayers()
+            }
+
+
         }
     }
 }
