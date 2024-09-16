@@ -1,8 +1,9 @@
-import { CubesScene } from "../drawing/CubesScene";
-import { ClaimState } from "./models/Cube";
-import { CubeSet } from "./models/CubeSet";
-import { Player } from "./Player";
 
+import { Cube, ClaimState } from "./Cube.js";
+
+import { CubeSet } from "./CubeSet.js";
+import { Player } from "../Player.js";
+import { CubesScene } from '../../drawing/CubesScene.js'
 
 
 export default class Game {
@@ -11,6 +12,7 @@ export default class Game {
         this.cubeScene = null;
 
         this.cubeSet = new CubeSet(this);
+
         this.players = [
             new Player("Player 1", ClaimState.X),
             new Player("Player 2", ClaimState.O),
@@ -18,28 +20,32 @@ export default class Game {
         this.currentPlayerIndex = 0;
 
         this.winner = null;
-        this.gameOver = null;
+        this.gameOver = false;
     }
 
     render() {
         this.cubeScene = new CubesScene();
     }
-    play() {
+    play(verboseConsole = false) {
         this.gameOver = false;
         this.winner = null;
 
         while (!this.gameOver) {
             const currentPlayer = this.players[this.currentPlayerIndex];
             const move = currentPlayer.makeMove(this.cubeSet);
-            console.log(`${currentPlayer.name} claimed cube at (${move.x}, ${move.y}, ${move.z})`);
+
+            if (verboseConsole) {
+                console.log(`${currentPlayer.name} claimed cube at (${move.x}, ${move.y}, ${move.z})`);
+                console.log(`${this.cubeSet.toStringTUI()}`)
+            }
 
             const consecutiveClaims = this.cubeSet.getConsecutiveClaims(3);
             if (consecutiveClaims.length > 0) {
 
                 this.gameOver = true;
                 this.winner = currentPlayer;
-
-                console.log(`Game over! ${this.winner.name} wins!`);
+                if (verboseConsole)
+                    console.log(`Game over! ${this.winner.name} wins!`);
 
             } else {
                 this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;

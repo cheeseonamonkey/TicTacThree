@@ -1,4 +1,4 @@
-import { ClaimState } from "./models/Cube";
+import { ClaimState, Cube } from "./models/Cube.js";
 
 export class Player {
     constructor(name, claimSymbol) {
@@ -6,7 +6,7 @@ export class Player {
         this.claimSymbol = claimSymbol;
     }
 
-    makeMove(cubeSet) {
+    makeMove(cubeSet, verboseConsole = false) {
         const winningMove = this.getWinningMove(cubeSet);
         if (winningMove) {
             return winningMove;

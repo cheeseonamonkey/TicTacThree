@@ -1,9 +1,7 @@
-export function Simulator() {
+export function simulator(numGames = 1000, verboseConsole = false) {
 
    (async () => {
-      const Game = await import("./players.js");
-      await import("./drawing.js");
-      await import("./dataClasses.js");
+      const Game = await import("./classes/game/models/Game.js");
       //   const Simulator = await import("./simulator.js");
 
       let winners = {};
@@ -12,8 +10,7 @@ export function Simulator() {
       winners["Player 2"] = 0;
 
       const batchSize = 20;
-      const totalGames = 50_000;
-      const numBatches = Math.ceil(totalGames / batchSize); // Calculate the number of batches
+      const numBatches = Math.ceil(numGames / batchSize);
 
       for (let batch = 0; batch < numBatches; batch++) {
          const batchPromises = [];
@@ -24,14 +21,19 @@ export function Simulator() {
 
                let game = new Game.default();
                console.log("Game:");
-               await game.play();
+               game.play(verboseConsole = true);
 
                winners[game.winner.name] = winners[game.winner.name] + 1;
 
+               if (verboseConsole)
+                  console.log(game.cubeSet.toStringTUI());
+
                resolve();
+
             });
 
             batchPromises.push(gamePromise);
+
          }
 
          await Promise.all(batchPromises);
@@ -45,3 +47,7 @@ export function Simulator() {
 
 
 }
+
+
+
+simulator(1, true);

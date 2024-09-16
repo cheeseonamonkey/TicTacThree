@@ -1,5 +1,5 @@
-import { CubeObject } from "./CubeObject";
 
+import { CubeObject } from "./CubeObject";
 
 export class CubesScene {
     constructor(parentGame) {

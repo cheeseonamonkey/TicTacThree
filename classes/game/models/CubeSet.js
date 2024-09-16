@@ -1,5 +1,5 @@
-import { ClaimState } from "./Cube";
-import { Cube } from "./Cube";
+import { ClaimState } from "./Cube.js";
+import { Cube } from "./Cube.js";
 
 
 
